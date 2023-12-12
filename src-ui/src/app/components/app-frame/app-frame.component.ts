@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core'
+import { Component, HostListener, OnInit, ViewChild } from '@angular/core'
 import { FormControl } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { from, Observable } from 'rxjs'
@@ -40,7 +40,7 @@ import {
   CdkDragDrop,
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgbModal, NgbTypeahead } from '@ng-bootstrap/ng-bootstrap'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 
 @Component({
@@ -60,6 +60,7 @@ export class AppFrameComponent
   slimSidebarAnimating: boolean = false
 
   searchField = new FormControl('')
+  @ViewChild('searchFieldTypeahead') searchFieldTypeahead: NgbTypeahead
 
   constructor(
     public router: Router,
@@ -149,9 +150,13 @@ export class AppFrameComponent
     this.searchField.reset('')
   }
 
-  searchFieldKeyup(event: KeyboardEvent) {
+  searchFieldKeyDown(event: KeyboardEvent) {
     if (event.key == 'Escape') {
-      this.resetSearchField()
+      if (this.searchFieldTypeahead?.isPopupOpen()) {
+        this.searchFieldTypeahead.dismissPopup()
+      } else {
+        this.resetSearchField()
+      }
     }
   }
 

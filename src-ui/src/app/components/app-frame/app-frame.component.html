@@ -15,8 +15,12 @@
       <svg width="1em" height="1em" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#search"/>
       </svg>
-      <input class="form-control form-control-sm" type="text" placeholder="Search documents" aria-label="Search"
-        [formControl]="searchField" [ngbTypeahead]="searchAutoComplete" (keyup)="searchFieldKeyup($event)" (selectItem)="itemSelected($event)" i18n-placeholder>
+      <input class="form-control form-control-sm" type="text" placeholder="Search documents" i18n-placeholder aria-label="Search"
+        [formControl]="searchField"
+        [ngbTypeahead]="searchAutoComplete"
+        (keydown)="searchFieldKeyDown($event)"
+        (selectItem)="itemSelected($event)"
+        #searchFieldTypeahead="ngbTypeahead">
       <button type="button" *ngIf="!searchFieldEmpty" class="btn btn-link btn-sm px-0 position-absolute top-0 end-0" (click)="resetSearchField()">
         <svg fill="currentColor" class="buttonicon-sm me-1">
           <use xlink:href="assets/bootstrap-icons.svg#x"/>

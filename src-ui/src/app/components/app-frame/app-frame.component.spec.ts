@@ -303,7 +303,6 @@ describe('AppFrameComponent', () => {
     serviceAutocompleteSpy.mockReturnValue(
       throwError(() => new Error('autcomplete failed'))
     )
-    // serviceAutocompleteSpy.mockReturnValue(of([' world']))
     let result
     component.searchAutoComplete(of('hello')).subscribe((res) => {
       result = res
@@ -313,14 +312,25 @@ describe('AppFrameComponent', () => {
     expect(result).toEqual([])
   }))
 
-  it('should support reset search field', () => {
-    const resetSpy = jest.spyOn(component, 'resetSearchField')
+  it('should support close typeahead and then reset search field', fakeAsync(() => {
     const input = (fixture.nativeElement as HTMLDivElement).querySelector(
       'input'
     ) as HTMLInputElement
-    input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Escape' }))
+    ;(component.searchFieldTypeahead as any)._openPopup()
+    tick(500)
+    const resetSpy = jest.spyOn(component, 'resetSearchField')
+    const dismissSpy = jest.spyOn(
+      component.searchFieldTypeahead,
+      'dismissPopup'
+    )
+    expect(component.searchFieldTypeahead.isPopupOpen()).toBeTruthy()
+    // first dismiss popup
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+    expect(dismissSpy).toHaveBeenCalled()
+    // then clear field
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
     expect(resetSpy).toHaveBeenCalled()
-  })
+  }))
 
   it('should support choosing a search item', () => {
     expect(component.searchField.value).toEqual('')
