@@ -508,6 +508,23 @@ export class BulkEditorComponent
       })
   }
 
+  rotateSelected() {
+    let modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Rotate confirm`
+    modal.componentInstance.messageBold = $localize`This operation will permanently rotate ${this.list.selected.size} selected document(s).`
+    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.btnClass = 'btn-danger'
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        modal.componentInstance.buttonsEnabled = false
+        this.executeBulkOperation(modal, 'rotate', { degrees: 90 })
+      })
+  }
+
   setPermissions() {
     let modal = this.modalService.open(PermissionsDialogComponent, {
       backdrop: 'static',
