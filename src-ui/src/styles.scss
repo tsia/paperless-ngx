@@ -13,13 +13,23 @@ $grid-breakpoints: (
 
 $form-file-button-bg: var(--bs-body-bg);
 $form-file-button-hover-bg: var(--pngx-bg-alt);
+$font-family-sans-serif: 'Inter', sans-serif;
 
 @import "node_modules/bootstrap/scss/bootstrap";
 @import "theme";
+@import "inter";
 @import "~@ng-select/ng-select/themes/default.theme.css";
 @import "print";
 
 // Paperless-ngx styles
+
+:root {
+  font-feature-settings: 'liga' 1, 'calt' 1; /* fix for Chrome */
+}
+@supports (font-variation-settings: normal) {
+  :root { font-family: InterVariable, sans-serif; }
+}
+
 body {
   font-size: 0.875rem;
   height: 100vh;
