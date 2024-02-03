@@ -76,8 +76,12 @@
                 <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
               </button>
               <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
-                <button ngbDropdownItem (click)="redoOcrSelected()" [disabled]="!userCanEditAll" i18n>Redo OCR</button>
-                <button ngbDropdownItem (click)="rotateSelected()" [disabled]="!userCanEditAll" i18n>Rotate</button>
+                <button ngbDropdownItem (click)="redoOcrSelected()" [disabled]="!userCanEditAll">
+                  <i-bs name="body-text"></i-bs>&nbsp;<ng-container i18n>Redo OCR</ng-container>
+                </button>
+                <button ngbDropdownItem (click)="rotateSelected()" [disabled]="!userCanEditAll">
+                  <i-bs name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Rotate</ng-container>
+                </button>
               </div>
             </div>
           </div>

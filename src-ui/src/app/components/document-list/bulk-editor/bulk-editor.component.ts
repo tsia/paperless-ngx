@@ -34,6 +34,7 @@ import {
 } from 'src/app/services/permissions.service'
 import { FormControl, FormGroup } from '@angular/forms'
 import { first, Subject, takeUntil } from 'rxjs'
+import { RotateConfirmDialogComponent } from '../../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 
 @Component({
   selector: 'pngx-bulk-editor',
@@ -509,19 +510,23 @@ export class BulkEditorComponent
   }
 
   rotateSelected() {
-    let modal = this.modalService.open(ConfirmDialogComponent, {
+    let modal = this.modalService.open(RotateConfirmDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.title = $localize`Rotate confirm`
-    modal.componentInstance.messageBold = $localize`This operation will permanently rotate ${this.list.selected.size} selected document(s).`
-    modal.componentInstance.message = $localize`This operation cannot be undone.`
-    modal.componentInstance.btnClass = 'btn-danger'
-    modal.componentInstance.btnCaption = $localize`Proceed`
-    modal.componentInstance.confirmClicked
+    const rotateDialog = modal.componentInstance as RotateConfirmDialogComponent
+    rotateDialog.title = $localize`Rotate confirm`
+    rotateDialog.messageBold = $localize`This operation will permanently rotate ${this.list.selected.size} selected document(s).`
+    rotateDialog.message = $localize`This operation cannot be undone.`
+    rotateDialog.btnClass = 'btn-danger'
+    rotateDialog.btnCaption = $localize`Proceed`
+    rotateDialog.documentID = Array.from(this.list.selected)[0]
+    rotateDialog.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
-        modal.componentInstance.buttonsEnabled = false
-        this.executeBulkOperation(modal, 'rotate', { degrees: 90 })
+        rotateDialog.buttonsEnabled = false
+        this.executeBulkOperation(modal, 'rotate', {
+          degrees: rotateDialog.degrees,
+        })
       })
   }
 

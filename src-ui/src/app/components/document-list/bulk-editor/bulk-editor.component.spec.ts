@@ -41,6 +41,8 @@ import { PermissionsUserComponent } from '../../common/input/permissions/permiss
 import { NgSelectModule } from '@ng-select/ng-select'
 import { GroupService } from 'src/app/services/rest/group.service'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
+import { RotateConfirmDialogComponent } from '../../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 
 const selectionData: SelectionData = {
   selected_tags: [
@@ -81,6 +83,7 @@ describe('BulkEditorComponent', () => {
         SelectComponent,
         PermissionsGroupComponent,
         PermissionsUserComponent,
+        RotateConfirmDialogComponent,
       ],
       providers: [
         PermissionsService,
@@ -789,6 +792,42 @@ describe('BulkEditorComponent', () => {
       documents: [3, 4],
       method: 'redo_ocr',
       parameters: {},
+    })
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
+    ) // list reload
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
+    ) // listAllFilteredIds
+  })
+
+  it('should support rotate', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'documents', 'get')
+      .mockReturnValue([{ id: 3 }, { id: 4 }])
+    jest
+      .spyOn(documentListViewService, 'selected', 'get')
+      .mockReturnValue(new Set([3, 4]))
+    jest
+      .spyOn(permissionsService, 'currentUserHasObjectPermissions')
+      .mockReturnValue(true)
+    component.showConfirmationDialogs = true
+    fixture.detectChanges()
+    component.rotateSelected()
+    expect(modal).not.toBeUndefined()
+    modal.componentInstance.rotate()
+    modal.componentInstance.confirm()
+    let req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    req.flush(true)
+    expect(req.request.body).toEqual({
+      documents: [3, 4],
+      method: 'rotate',
+      parameters: { degrees: 90 },
     })
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
