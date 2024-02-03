@@ -921,8 +921,14 @@ class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
             self._validate_owner(parameters["owner"])
 
     def _validate_parameters_rotate(self, parameters):
-        if "degrees" not in parameters or not float(parameters["degrees"]).is_integer():
-            raise serializers.ValidationError("add_tags not specified")
+        try:
+            if (
+                "degrees" not in parameters
+                or not float(parameters["degrees"]).is_integer()
+            ):
+                raise serializers.ValidationError("invalid rotation degrees")
+        except ValueError:
+            raise serializers.ValidationError("invalid rotation degrees")
 
     def validate(self, attrs):
         method = attrs["method"]
