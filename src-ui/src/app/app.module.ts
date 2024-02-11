@@ -113,6 +113,8 @@ import { ConfigComponent } from './components/admin/config/config.component'
 import { FileComponent } from './components/common/input/file/file.component'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { ConfirmButtonComponent } from './components/common/confirm-button/confirm-button.component'
+import { SystemStatusDialogComponent } from './components/common/system-status-dialog/system-status-dialog.component'
+import { NgxFilesizeModule } from 'ngx-filesize'
 import {
   archive,
   arrowCounterclockwise,
@@ -128,12 +130,14 @@ import {
   boxes,
   calendar,
   calendarEvent,
+  cardChecklist,
   caretDown,
   caretUp,
   chatLeftText,
   check,
   check2All,
   checkAll,
+  checkCircleFill,
   checkLg,
   chevronDoubleLeft,
   chevronDoubleRight,
@@ -147,6 +151,7 @@ import {
   download,
   envelope,
   exclamationTriangle,
+  exclamationTriangleFill,
   eye,
   fileEarmark,
   fileEarmarkCheck,
@@ -212,12 +217,14 @@ const icons = {
   boxes,
   calendar,
   calendarEvent,
+  cardChecklist,
   caretDown,
   caretUp,
   chatLeftText,
   check,
   check2All,
   checkAll,
+  checkCircleFill,
   checkLg,
   chevronDoubleLeft,
   chevronDoubleRight,
@@ -231,6 +238,7 @@ const icons = {
   download,
   envelope,
   exclamationTriangle,
+  exclamationTriangleFill,
   eye,
   fileEarmark,
   fileEarmarkCheck,
@@ -441,6 +449,7 @@ function initializeApp(settings: SettingsService) {
     ConfigComponent,
     FileComponent,
     ConfirmButtonComponent,
+    SystemStatusDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -455,6 +464,7 @@ function initializeApp(settings: SettingsService) {
     TourNgBootstrapModule,
     DragDropModule,
     NgxBootstrapIconsModule.pick(icons),
+    NgxFilesizeModule,
   ],
   providers: [
     {
