@@ -116,6 +116,7 @@ import { ConfirmButtonComponent } from './components/common/confirm-button/confi
 import { SystemStatusDialogComponent } from './components/common/system-status-dialog/system-status-dialog.component'
 import { NgxFilesizeModule } from 'ngx-filesize'
 import {
+  airplane,
   archive,
   arrowCounterclockwise,
   arrowDown,
@@ -203,6 +204,7 @@ import {
 } from 'ngx-bootstrap-icons'
 
 const icons = {
+  airplane,
   archive,
   arrowCounterclockwise,
   arrowDown,
