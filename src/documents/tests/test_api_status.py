@@ -54,6 +54,16 @@ class TestSystemStatus(APITestCase):
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(response.data["install_type"], "kubernetes")
 
+    @mock.patch("django.db.migrations.loader.MigrationLoader", autospec=True)
+    def test_system_status_db_error(self, mock_migration_loader):
+        mock_migration_loader.side_effect = Exception("DB error")
+        self.client.force_login(self.user)
+        response = self.client.get(self.ENDPOINT)
+        mock_migration_loader.assert_called_once()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["database"]["status"], "ERROR")
+        self.assertIsNotNone(response.data["database"]["error"])
+
     @mock.patch("redis.Redis.execute_command")
     def test_system_status_redis_ping(self, mock_ping):
         mock_ping.return_value = True

@@ -1561,9 +1561,9 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
                 f"{m.app}.{m.name}"
                 for m in MigrationRecorder.Migration.objects.all().order_by("id")
             ]
-        except Exception as e:  # pragma: no cover
-            applied_migrations = []
+        except Exception as e:
             db_status = "ERROR"
+            all_migrations = applied_migrations = []
             logger.exception(f"System status error connecting to database: {e}")
             db_error = "Error connecting to database, check logs for more detail."
 
@@ -1629,7 +1629,11 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
                     "status": db_status,
                     "error": db_error,
                     "migration_status": {
-                        "latest_migration": applied_migrations[-1],
+                        "latest_migration": (
+                            applied_migrations[-1]
+                            if len(applied_migrations) > 0
+                            else None
+                        ),
                         "unapplied_migrations": [
                             m for m in all_migrations if m not in applied_migrations
                         ],
