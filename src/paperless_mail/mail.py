@@ -623,7 +623,8 @@ class MailAccountHandler(LoggingMixin):
         doc_type = rule.assign_document_type
 
         if (
-            rule.consumption_scope == MailRule.ConsumptionScope.EML_ONLY
+            (rule.consumption_scope == MailRule.ConsumptionScope.EML_ONLY
+            and not message.attachments)
             or rule.consumption_scope == MailRule.ConsumptionScope.EVERYTHING
         ):
             processed_elements += self._process_eml(
