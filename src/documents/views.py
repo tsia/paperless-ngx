@@ -35,6 +35,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from django.utils.timezone import make_aware
 from django.utils.translation import get_language
 from django.views import View
 from django.views.decorators.cache import cache_control
@@ -94,6 +95,7 @@ from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
 from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
+from documents.index import open_index
 from documents.matching import match_correspondents
 from documents.matching import match_document_types
 from documents.matching import match_storage_paths
@@ -1579,12 +1581,38 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
                 redis_error = "Error connecting to redis, check logs for more detail."
 
         try:
-            ping = celery_app.control.inspect().ping()
-            first_worker_ping = ping[next(iter(ping.keys()))]
+            celery_ping = celery_app.control.inspect().ping()
+            first_worker_ping = celery_ping[next(iter(celery_ping.keys()))]
             if first_worker_ping["ok"] == "pong":
                 celery_active = "OK"
         except Exception:
             celery_active = "ERROR"
+
+        index_error = None
+        try:
+            index = open_index()
+            index_status = "OK"
+            index_last_modified = make_aware(
+                datetime.fromtimestamp(index.last_modified()),
+            )
+        except Exception as e:
+            index_status = "ERROR"
+            index_error = "Error opening index, check logs for more detail."
+            logger.exception(f"System status error opening index: {e}")
+            index_last_modified = None
+
+        classifier_error = None
+        try:
+            load_classifier()
+            classifier_status = "OK"
+            classifier_last_modified = make_aware(
+                datetime.fromtimestamp(os.path.getmtime(settings.MODEL_FILE)),
+            )
+        except Exception as e:
+            classifier_status = "ERROR"
+            classifier_last_modified = None
+            classifier_error = "Error loading classifier, check logs for more detail."
+            logger.exception(f"System status error loading classifier: {e}")
 
         return Response(
             {
@@ -1612,6 +1640,12 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
                     "redis_status": redis_status,
                     "redis_error": redis_error,
                     "celery_status": celery_active,
+                    "index_status": index_status,
+                    "index_last_modified": index_last_modified,
+                    "index_error": index_error,
+                    "classifier_status": classifier_status,
+                    "classifier_last_modified": classifier_last_modified,
+                    "classifier_error": classifier_error,
                 },
             },
         )
