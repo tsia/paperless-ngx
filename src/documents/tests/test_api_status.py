@@ -80,6 +80,18 @@ class TestSystemStatus(APITestCase):
         self.assertEqual(response.data["tasks"]["index_status"], "OK")
         self.assertIsNotNone(response.data["tasks"]["index_last_modified"])
 
+    @override_settings(INDEX_DIR="/tmp/index/")
+    @mock.patch("documents.index.open_index", autospec=True)
+    def test_system_status_index_error(self, mock_open_index):
+        mock_open_index.return_value = None
+        mock_open_index.side_effect = Exception("Index error")
+        self.client.force_login(self.user)
+        response = self.client.get(self.ENDPOINT)
+        mock_open_index.assert_called_once()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["tasks"]["index_status"], "ERROR")
+        self.assertIsNotNone(response.data["tasks"]["index_error"])
+
     @override_settings(MODEL_FILE="/tmp/does_not_exist")
     def test_system_status_classifier_ok(self):
         with open(settings.MODEL_FILE, "w") as f:

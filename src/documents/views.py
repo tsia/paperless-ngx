@@ -1595,7 +1595,7 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
             index_last_modified = make_aware(
                 datetime.fromtimestamp(ix.last_modified()),
             )
-        except Exception as e:  # pragma: no cover
+        except Exception as e:
             index_status = "ERROR"
             index_error = "Error opening index, check logs for more detail."
             logger.exception(f"System status error opening index: {e}")
