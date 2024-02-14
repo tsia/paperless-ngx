@@ -66,6 +66,7 @@ from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.viewsets import ViewSet
 
 from documents import bulk_edit
+from documents import index
 from documents.bulk_download import ArchiveOnlyStrategy
 from documents.bulk_download import OriginalAndArchiveStrategy
 from documents.bulk_download import OriginalsOnlyStrategy
@@ -95,7 +96,6 @@ from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
 from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
-from documents.index import open_index
 from documents.matching import match_correspondents
 from documents.matching import match_document_types
 from documents.matching import match_storage_paths
@@ -1590,12 +1590,12 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
 
         index_error = None
         try:
-            index = open_index()
+            ix = index.open_index()
             index_status = "OK"
             index_last_modified = make_aware(
-                datetime.fromtimestamp(index.last_modified()),
+                datetime.fromtimestamp(ix.last_modified()),
             )
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             index_status = "ERROR"
             index_error = "Error opening index, check logs for more detail."
             logger.exception(f"System status error opening index: {e}")
