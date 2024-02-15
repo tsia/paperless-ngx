@@ -624,8 +624,8 @@ class MailAccountHandler(LoggingMixin):
 
         if (
             rule.consumption_scope == MailRule.ConsumptionScope.EML_ONLY
-            or rule.consumption_scope == MailRule.ConsumptionScope.EVERYTHING
-        ):
+            and not message.attachments
+        ) or rule.consumption_scope == MailRule.ConsumptionScipe.EVERYTHING:
             processed_elements += self._process_eml(
                 message,
                 rule,
